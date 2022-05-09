@@ -90,23 +90,25 @@ CC        = gcc
 # Here are some possible CFLAGS statements:
 #
 #
+#DM: Clang needs to desactivate the implicit function declaration even if selecting C89.
+#
 #A minimal one which tells Phylip that is is running on a modern Mac
-CFLAGS = -DMACOS10
+#CFLAGS = -DMACOS10 -Wno-error=implicit-function-declaration
 #
 # A basic one for debugging
-#CFLAGS  = -ggdb -DMACOS10
+#CFLAGS  = -ggdb -DMACOS10 -Wno-error=implicit-function-declaration
 #
 # An optimized one for gcc
-#CFLAGS  = -O3 -DMACOS10 -fomit-frame-pointer
+CFLAGS  = -O3 -DMACOS10 -fomit-frame-pointer -Wno-error=implicit-function-declaration
 #
 # For some serious debugging using Gnu gcc
 #
-#CFLAGS=-g -DMACOS10 -Wall -Wmain -Wmissing-prototypes -Wreturn-type -Wstrict-prototypes  -Wunused -Werror -Wredundant-decls -Waggregate-return -Wcast-align -Wcomment
+#CFLAGS=-g -DMACOS10 -Wall -Wmain -Wmissing-prototypes -Wreturn-type -Wstrict-prototypes  -Wunused -Werror -Wredundant-decls -Waggregate-return -Wcast-align -Wcomment -Wno-error=implicit-function-declaration
 #
 # For doing code coverage with gcov
 #
-#CFLAGS	=	-ggdb -DMACOS10 -fprofile-arcs -ftest-coverage
-#CFLAGS	=	-pg -DMACOS10
+#CFLAGS	=	-ggdb -DMACOS10 -fprofile-arcs -ftest-coverage -Wno-error=implicit-function-declaration
+#CFLAGS	=	-pg -DMACOS10 -Wno-error=implicit-function-declaration
 #
 # For Digital Alpha systems with Compaq Tru64 Unix
 # (however, be aware that this may cause floating-point problems in programs
@@ -230,12 +232,13 @@ put:
 	@cp $(JARS) $(EXEDIR)
 	@echo "Installing font files in $(EXEDIR)"
 	@cp font* $(EXEDIR)
-	@echo "Copying testdata to $(EXEDIR)/testdata"
-	mkdir $(EXEDIR)/testdata
-	for i in $(TESTDIR); do \
-      mkdir $(EXEDIR)/testdata/$$i; \
-      cp TestData/$$i/*.txt $(EXEDIR)/testdata/$$i; \
-    done
+	@echo "WARNING: This repository does not include the test data"
+#	@echo "Copying testdata to $(EXEDIR)/testdata"
+#	mkdir $(EXEDIR)/testdata
+#	for i in $(TESTDIR); do \
+#      mkdir $(EXEDIR)/testdata/$$i; \
+#      cp TestData/$$i/*.txt $(EXEDIR)/testdata/$$i; \
+#    done
 	@echo "Finished installation."
 	@echo ""
 
@@ -483,8 +486,8 @@ treedist:     treedist.o phylip.o cons.o
 #
 %.app: % mac/Info.plist.in mac/command.in mac/%.icns 
 	@rm -rf $@
-	/Developer/Tools/Rez -d __DARWIN__ -t APPL Carbon.r -o $<
-	/Developer/Tools/SetFile -a C $<
+	Rez -d __DARWIN__ -t APPL -f /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/ Carbon.r -o $<
+	SetFile -a C $<
 	-mkdir -p $@/Contents/MacOS
 	-mkdir -p $@/Contents/Resources
 	sed -e "s/IDENTIFIER/$</" \
